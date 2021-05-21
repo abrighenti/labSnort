@@ -48,7 +48,7 @@ def home():
         abort(403)
         
 if __name__ == '__main__':
-    app.run(debug=True) # run the flask app on debug mode
+    app.run(debug=True, host='0.0.0.0', port=5000) # run the flask app on debug mode
 
 
 #<h3> Welcome, {{session['user_name']}}! </h3>
