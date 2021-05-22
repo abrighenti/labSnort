@@ -34,18 +34,15 @@ def login():
         insertedPassword=request.form['password']
         con = sqlite3.connect('example.db')
         cur = con.cursor()
+        print(insertedUser)
+        print(insertedPassword)
         cur.execute("SELECT name, surname FROM users WHERE username = '%s' and password = '%s'"% (insertedUser, insertedPassword))
         rows = cur.fetchall()
-        session['returned']=rows
-        return redirect(url_for('home'))
+        returnObject={}
+        returnObject['fetched']=rows
+        return returnObject
     return render_template('login.html', error=error)
 
-@app.route('/home', methods=['GET'])
-def home():
-    if 'returned' in session and session['returned'] != '':
-        return render_template('protected.html')
-    else:
-        abort(403)
         
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000) # run the flask app on debug mode
