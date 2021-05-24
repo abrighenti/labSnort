@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Flask, render_template, redirect, url_for, request, session, abort
 import string
 import random
@@ -9,7 +10,24 @@ app.secret_key = ''.join(random.choice(chars) for i in range(25))
 
     
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/sql', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        insertedUser=request.form['username']
+        insertedPassword=request.form['password']
+        con = sqlite3.connect('example.db')
+        cur = con.cursor()
+        print(insertedUser)
+        print(insertedPassword)
+        cur.execute("SELECT name, surname FROM users WHERE username = '%s' and password = '%s'"% (insertedUser, insertedPassword))
+        rows = cur.fetchall()
+        returnObject={}
+        returnObject['fetched']=rows
+        return returnObject
+    return render_template('sqlLogin.html', error=error)
+
+@app.route('/buffer', methods=['GET', 'POST'])
 def home():
     error = None
     if request.method == 'POST':
@@ -22,10 +40,11 @@ def home():
         else:
             returnedObject['output']=result.stdout.decode('utf-8')
         return returnedObject
-    return render_template('home.html', error=error)
+    return render_template('buffer.html', error=error)
+
         
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0',port=5001) # run the flask app on debug mode
+    app.run(debug=True, host='192.168.1.2', port=5000) # run the flask app on debug mode
 
 
 #<h3> Welcome, {{session['user_name']}}! </h3>
