@@ -1,8 +1,7 @@
-import sqlite3
-from flask import Flask, render_template, redirect, url_for, request, session, abort
-import string
-import random
-import subprocess
+from flask import Flask, render_template, redirect, url_for, request, session, abort, jsonify, send_from_directory
+import string, random, subprocess, os, sqlite3
+
+DIR = "/home/server/Desktop/labSnort/files"
 
 app = Flask(__name__)
 chars=string.ascii_letters + string.digits
@@ -42,7 +41,19 @@ def home():
         return returnedObject
     return render_template('buffer.html', error=error)
 
-        
+@app.route('/files', methods=['GET'])
+def list_files():
+    files = []
+    for filename in os.listdir(DIR):
+    	path = os.path.join(DIR, filename)
+    	if os.path.isfile(path):
+    		files.append(filename)
+    return jsonify(files)
+
+@app.route('/files/<path:path>')
+def get_file(path):
+	return send_from_directory(DIR, path, as_attachment=True)	
+	       
 if __name__ == '__main__':
     app.run(debug=True, host='192.168.1.2', port=5000) # run the flask app on debug mode
 
